@@ -7,6 +7,10 @@ const urlPoster = 'https://image.tmdb.org/t/p/w500';
 function apiSearch(event) {
     event.preventDefault();
     const searchText = document.querySelector('.form-control').value;
+    if(searchText.trim().length === 0) {
+        movie.innerHTML = '<h2 class="col-12 text-center text-danger">Поле поиска не должно быть пустым</h2>';
+        return
+    }
     const server = 'https://api.themoviedb.org/3/search/multi?api_key=942cf276adefa306549de647ce5a6e18&language=ru&query=' + searchText;
     movie.innerHTML = '<div class="spinner"></div>';
 
