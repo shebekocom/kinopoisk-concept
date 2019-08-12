@@ -23,6 +23,9 @@ function apiSearch(event) {
         })
         .then(function(output){
              let inner = '';
+            if(output.results.length === 0) {
+                inner = '<h2 class="col-12 text-center text-info">По вашему запросу ничего не найдено</h2>';
+            }
             output.results.forEach(function (item) {
                 let nameItem = item.name || item.title;
                 let dateItem = item.first_air_date || item.release_date;
