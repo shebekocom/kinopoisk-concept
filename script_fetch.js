@@ -30,9 +30,11 @@ function apiSearch(event) {
                 let nameItem = item.name || item.title;
                 let dateItem = item.first_air_date || item.release_date;
                 const poster = item.poster_path ? urlPoster + item.poster_path : './img/noposter.png';
-                 inner += `
+                let dataInfo = '';
+                if(item.media_type !== 'person') dataInfo = `data-id="${item.id}" data-type="${item.media_type}"`;
+                inner += `
                  <div class="col-12 col-md-6 col-xl-3 item">
-                 <img src="${poster}" class="img_poster" alt="${nameItem}">
+                 <img src="${poster}" class="img_poster" alt="${nameItem}" ${dataInfo}>
                  <p>${nameItem}</p>
                     <div class="alert alert-primary" role="alert">
                     Дата релиза: </br>${dateItem}
@@ -40,6 +42,9 @@ function apiSearch(event) {
                  </div>`;
             });
             movie.innerHTML = inner;
+
+            addEventMedia();
+
         })
         .catch(function(reason){
             movie.innerHTML = 'Упс, что то пошо не так!';
@@ -49,3 +54,15 @@ function apiSearch(event) {
 }
 
 searchForm.addEventListener('submit', apiSearch);
+
+function addEventMedia(){
+const media = movie.querySelectorAll('img[data-id]');
+media.forEach(function (elem) {
+    elem.style.cursor = 'pointer';
+    elem.addEventListener('click', showFullInfo);
+});
+}
+
+function showFullInfo(){
+    console.log(this)
+}
