@@ -64,16 +64,20 @@ function addEventMedia() {
 }
 
 function showFullInfo() {
+    let id = this.dataset.id;
+    let type = this.dataset.type;
     let url = '';
-    if (this.dataset.type === 'movie') {
+    if (type === 'movie') {
         url = 'https://api.themoviedb.org/3/movie/' +
-            this.dataset.id + '?api_key=942cf276adefa306549de647ce5a6e18&language=ru'
-    } else if (this.dataset.type === 'tv') {
+            id + '?api_key=942cf276adefa306549de647ce5a6e18&language=ru'
+    } else if (type === 'tv') {
         url = 'https://api.themoviedb.org/3/tv/' +
-            this.dataset.id + '?api_key=942cf276adefa306549de647ce5a6e18&language=ru'
+            id + '?api_key=942cf276adefa306549de647ce5a6e18&language=ru'
     } else {
         movie.innerHTML = '<h2 class="col-12 text-center text-info">Произошла ошибка перезайдите позже</h2>'
     }
+
+
 
     fetch(url)
         .then(function (value) {
@@ -83,7 +87,6 @@ function showFullInfo() {
             return value.json();
         })
         .then(function (output) {
-            console.log(output)
             movie.innerHTML = `
             <h4 class="col-12 text-center text-info">${output.name || output.title}</h4>
             <div class="col-4">
@@ -99,9 +102,15 @@ function showFullInfo() {
                 ${(output.last_episode_to_air) ? `<p>${output.number_of_seasons} сезон ${output.last_episode_to_air.episode_number} серий вышло</p>` : ''}
 
                 <p> Описание: ${output.overview}</p>
+                
+                <br>
+                <div class="youtube"></div>
 
             </div>
            `;
+
+            getVideo(type, id);
+
         })
         .catch(function (reason) {
             movie.innerHTML = 'Упс, что то пошо не так!';
@@ -148,3 +157,35 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('error: ' + reason);
         });
 });
+
+function getVideo(type, id) {
+    let youtube = movie.querySelector('.youtube');
+
+    fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=942cf276adefa306549de647ce5a6e18&language=ru
+`)
+        .then((value) => {
+            if (value.status !== 200) {
+                return Promise.reject(new Error(value.status));
+            }
+            return value.json();
+        })
+        .then((output) => {
+            console.log(output);
+            let videoFrame = '<h5 class="text-info">Трейлеры</h5>';
+
+            if(output.results.length ===0){
+                videoFrame = '<p>К сожалению видео отсутствует</p>';
+            }
+
+            output.results.forEach((item)=>{
+                videoFrame += `<iframe width="560" height="315" src="https://www.youtube.com/embed/${item.key}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe><br>`;
+            })
+            youtube.innerHTML = videoFrame;
+
+        })
+        .catch((reason) => {
+            youtube.innerHTML = 'Видео отсутствует';
+            console.error(reason || reason.status);
+        });
+
+}
